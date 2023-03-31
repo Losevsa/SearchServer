@@ -96,6 +96,8 @@ bool SearchServer::loadConfig()
                 //value.toString();
     }
 
+    readFiles();
+    checkFreq();
     config.doscCount = config.filesPath.size();
 
     return true;
@@ -136,6 +138,64 @@ void SearchServer::loadRequests()
                 //value.toString();
     }
 }
+
+void SearchServer::readFiles()
+{
+    for (int i = 0; i < config.filesPath.size(); i++)
+    {
+        QFile file(config.filesPath[i]);
+        if(!file.open(QFile::ReadOnly | QFile::Text))
+        {
+            continue;
+        }
+        QString str = file.readAll();
+        docs.push_back(str);
+    }
+}
+
+void SearchServer::checkFreq()
+{
+    for(int i = 0; i < config.filesPath.size(); i++)
+    {
+        QRegularExpression rx("\\s+");
+        QStringList words = docs[i].split(rx, Qt::SkipEmptyParts);
+
+        // Вывести каждое слово на отдельной строке
+        Entry entry;
+        entry.doc_id = i;
+        entry.count = 5;
+
+        QVector<Entry> temp;
+        temp.push_back(entry);
+
+        freq_dictionary.insert("test",temp);
+
+
+        //foreach(QString word, words)
+        //{
+        for(auto it = freq_dictionary.begin(); it != freq_dictionary.end(); ++it) {
+            qDebug() << "Key:" << it.key();
+
+            QVector<Entry> entries = it.value();
+            for(int i = 0; i < entries.size(); ++i) {
+                Entry entry = entries.at(i);
+                qDebug() << "Doc ID:" << entry.doc_id << "Count:" << entry.count;
+            }
+        }
+
+
+            //qDebug() << word;
+        //}
+        //Entry entry;
+    }
+}
+
+
+
+
+
+
+
 
 
 
