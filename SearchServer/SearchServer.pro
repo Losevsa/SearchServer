@@ -1,4 +1,4 @@
-QT       += core gui
+QT       += core gui concurrent
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -10,13 +10,13 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
-    serachserver.cpp
+    searchserver.cpp
 
 HEADERS += \
-    serachserver.h
+    searchserver.h
 
 FORMS += \
-    serachserver.ui
+    searchserver.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

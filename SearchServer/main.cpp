@@ -1,11 +1,11 @@
-#include "serachserver.h"
+#include "searchserver.h"
 
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    SerachServer w;
+    SearchServer w;
     w.show();
     return a.exec();
 }
