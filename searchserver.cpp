@@ -153,13 +153,15 @@ void SearchServer::readFiles()
         //docs.push_back(str);
     }
 
+    indexing.addFreqThreaded();
     //indexing.addDocs(docs);
 }
 
 void SearchServer::checkFreq()
 {
+    //QtConcurrent::run(&indexing, &DocsIndexing::newFreq());
 
-
+    //QFuture<void> future = QtConcurrent::run(std::ref(indexing), &DocsIndexing::newFreq);
 
     /*
 

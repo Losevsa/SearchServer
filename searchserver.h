@@ -13,6 +13,9 @@
 #include <QMap>
 #include <regex>
 #include <QStringList>
+#include <QThread>
+#include <QRunnable>
+#include <QThreadPool>
 
 #include "docsindexing.h"
 

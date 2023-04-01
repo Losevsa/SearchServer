@@ -5,6 +5,11 @@
 #include <QString>
 #include <QMap>
 #include <QMutex>
+#include <QRegularExpression>
+#include <QtConcurrent>
+#include <QThread>
+#include <QRunnable>
+#include <QThreadPool>
 
 struct Entry
 {
@@ -17,7 +22,13 @@ public:
     DocsIndexing();
     void addDocs(QVector<QString> docs);
     void addNewDoc(QString doc);
-    void addFreq();
+    void addFreqThreaded();
+
+public slots:
+    void upd()
+    {
+
+    }
 
 private:
     QVector<QString> docs;
