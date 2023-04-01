@@ -15,13 +15,13 @@ void docsIndexing(int num, int *currCount)
         }
         qDebug() << "no";
     }
-}*/
+}
 
 void docsIndexing()
 {
 
 }
-
+*/
 
 
 
@@ -97,7 +97,7 @@ bool SearchServer::loadConfig()
     }
 
     readFiles();
-    checkFreq();
+    //checkFreq();
     config.doscCount = config.filesPath.size();
 
     return true;
@@ -149,12 +149,20 @@ void SearchServer::readFiles()
             continue;
         }
         QString str = file.readAll();
-        docs.push_back(str);
+        indexing.addNewDoc(str);
+        //docs.push_back(str);
     }
+
+    //indexing.addDocs(docs);
 }
 
 void SearchServer::checkFreq()
 {
+
+
+
+    /*
+
     for(int i = 0; i < config.filesPath.size(); i++)
     {
         QRegularExpression rx("\\s+");
@@ -188,6 +196,7 @@ void SearchServer::checkFreq()
         //}
         //Entry entry;
     }
+    */
 }
 
 

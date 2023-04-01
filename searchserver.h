@@ -14,6 +14,8 @@
 #include <regex>
 #include <QStringList>
 
+#include "docsindexing.h"
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class SearchServer; }
@@ -27,11 +29,6 @@ struct Configuration
 
     QVector<QString> filesPath;
     int doscCount = 0;
-};
-
-struct Entry
-{
-    size_t doc_id, count;
 };
 
 class SearchServer : public QMainWindow
@@ -51,8 +48,9 @@ private:
     Ui::SearchServer *ui;
     Configuration config;
     QVector<QVector <QString>> words;
-    QVector<QString> docs;
-    QMap<QString, QVector<Entry>> freq_dictionary;
+    //QVector<QString> docs;
+    DocsIndexing indexing;
+    //QMap<QString, QVector<Entry>> freq_dictionary;
     int *currentCount;
 
 };
