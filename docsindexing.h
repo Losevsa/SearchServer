@@ -32,7 +32,7 @@ public slots:
 
 private:
     QVector<QString> docs;
-    QMap<QString, QVector<Entry>> freqDictionary;
+    QMap<QString, QVector<Entry>>* freqDictionary;
     QMutex writeIntoFreq;
 };
 

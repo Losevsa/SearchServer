@@ -1,11 +1,20 @@
 #include "docsindexing.h"
 
-void addNewFreq(size_t docId, QMap<QString, QVector<Entry>> *freqDictionary, QMutex* mutex, QString doc)
+void addNewFreq(size_t docId, QMap<QString, QVector<Entry>>* freqDictionary, QMutex* mutex, QString doc)
 {
     //"выписываем" все слова из doc
     QRegularExpression rx("\\s+");
     QStringList words = doc.split(rx, Qt::SkipEmptyParts);
 
+    /*
+    Entry test;
+    test.count = 4;
+    test.docId = 0;
+    QVector<Entry> testTwo;
+    testTwo.append(test);
+
+    *freqDictionary->insert("test", testTwo);
+    */
     //лочим для работы с freqDictionary
     QMutexLocker locker(mutex);
 
@@ -13,6 +22,52 @@ void addNewFreq(size_t docId, QMap<QString, QVector<Entry>> *freqDictionary, QMu
     foreach(QString word, words)
     {
         bool haveKeys = false;
+        if (freqDictionary->contains(word))
+        {
+            haveKeys = true;
+            QVector<Entry>& entry = (*freqDictionary)[word];
+
+            bool haveDocId = false;
+
+            QVector<Entry>::iterator it;
+            for (it = entry.begin(); it != entry.end(); ++it)
+            {
+                if (it->docId == docId)
+                {
+                    haveDocId = true;
+                    it->count++;
+                }
+
+            }
+
+            if (!haveDocId)
+            {
+                Entry entr;
+                entr.docId = docId;
+                entr.count = 1;
+                entry.append(entr);
+            }
+        }
+        else
+        {
+            if (!haveKeys)
+            {
+                Entry entr;
+                entr.docId = docId;
+                entr.count = 1;
+                QVector<Entry> newValue;
+                newValue.append(entr);
+
+                freqDictionary->insert(word, newValue);
+
+            }
+        }
+
+
+
+
+
+        //bool haveKeys = false;
         //проходимся по значениям слов в словаре и сравниваем есть ли такие слова
         QMap<QString, QVector<Entry>>::const_iterator iter = freqDictionary->constBegin();
         while (iter != freqDictionary->constEnd())
@@ -46,9 +101,8 @@ void addNewFreq(size_t docId, QMap<QString, QVector<Entry>> *freqDictionary, QMu
 
 
 
-
             }
-            qDebug() << iter.key() << ": " << &iter.value();
+            //qDebug() << iter.key() << ": " << &iter.value();
             iter++;
         }
 
@@ -88,6 +142,7 @@ void addNewFreq(size_t docId, QMap<QString, QVector<Entry>> *freqDictionary, QMu
 
 DocsIndexing::DocsIndexing()
 {
+    freqDictionary = new QMap<QString, QVector<Entry>>;
 }
 
 void DocsIndexing::addDocs(QVector<QString> docs)
@@ -105,19 +160,23 @@ void DocsIndexing::addFreqThreaded()
     QVector<QFuture<void>> threads;
     threads.reserve(5);
 
+    /*
     Entry test;
     test.count = 1;
-    test.docId = 2;
+    test.docId = 0;
     QVector<Entry> testTwo;
     testTwo.push_back(test);
-    freqDictionary.insert("qwer", testTwo);
-
-    int threadsCount = 0;
+    test.count = 10;
+    test.docId = 20;
+    testTwo.push_back(test);
+    freqDictionary->insert("qwer", testTwo);
+*/
+    //int threadsCount = 0;
     for (int i = 0; i < docs.size(); i++)
     {
 
-        threads.append(QtConcurrent::run(addNewFreq, i, &freqDictionary, &writeIntoFreq, docs[i]));
-        threadsCount++;
+        threads.append(QtConcurrent::run(addNewFreq, i, freqDictionary, &writeIntoFreq, docs[i]));
+        //threadsCount++;
 
         for (auto& future : threads) {
             future.waitForFinished();
@@ -137,10 +196,15 @@ void DocsIndexing::addFreqThreaded()
     }
 
 
-    QList<QString> anotherkeys = freqDictionary.keys();
-
-    for (const QString& key : anotherkeys) {
-        qDebug() << key;
+    QMap<QString, QVector<Entry>>::Iterator it;
+    for(it = freqDictionary->begin(); it != freqDictionary->end(); it++)
+    {
+        qDebug() << it.key();
+        QVector<Entry> entr = it.value();
+        for(int i = 0; i < entr.size(); i++)
+        {
+            qDebug() << "DocId: " << entr[i].docId << " Count" << entr[i].count;
+        }
     }
 }
 
