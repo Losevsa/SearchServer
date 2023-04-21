@@ -18,6 +18,7 @@
 #include <QThreadPool>
 
 #include "docsindexing.h"
+#include "search.h"
 
 
 QT_BEGIN_NAMESPACE
@@ -42,18 +43,19 @@ public:
     SearchServer(QWidget *parent = nullptr);
     ~SearchServer();
 
-    bool loadConfig();
-    void loadRequests();
-    void readFiles();
-    void checkFreq();
+    bool loadConfig();  // 1 загружаем конфиг
+    void loadRequests();    // 3 загружаем запросы и добавляим их в search
+    void readFiles(); // 2 читаем файлы
+    void loadRequestIntoAnswer();
 
 private:
     Ui::SearchServer *ui;
     Configuration config;
     QVector<QVector <QString>> words;
     //QVector<QString> docs;
+    QMap<QString, QVector<Entry>>* freqDictionary;
     DocsIndexing indexing;
-    //QMap<QString, QVector<Entry>> freq_dictionary;
+    Search searchWords;
     int *currentCount;
 
 };

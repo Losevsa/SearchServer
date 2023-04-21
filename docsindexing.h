@@ -10,6 +10,7 @@
 #include <QThread>
 #include <QRunnable>
 #include <QThreadPool>
+#include <QTextBrowser>
 
 struct Entry
 {
@@ -23,12 +24,7 @@ public:
     void addDocs(QVector<QString> docs);
     void addNewDoc(QString doc);
     void addFreqThreaded();
-
-public slots:
-    void upd()
-    {
-
-    }
+    void showFreq(QTextBrowser* browser);
 
 private:
     QVector<QString> docs;

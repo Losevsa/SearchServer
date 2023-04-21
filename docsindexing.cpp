@@ -15,6 +15,7 @@ void addNewFreq(size_t docId, QMap<QString, QVector<Entry>>* freqDictionary, QMu
 
     *freqDictionary->insert("test", testTwo);
     */
+
     //лочим для работы с freqDictionary
     QMutexLocker locker(mutex);
 
@@ -37,9 +38,7 @@ void addNewFreq(size_t docId, QMap<QString, QVector<Entry>>* freqDictionary, QMu
                     haveDocId = true;
                     it->count++;
                 }
-
             }
-
             if (!haveDocId)
             {
                 Entry entr;
@@ -59,14 +58,10 @@ void addNewFreq(size_t docId, QMap<QString, QVector<Entry>>* freqDictionary, QMu
                 newValue.append(entr);
 
                 freqDictionary->insert(word, newValue);
-
             }
         }
 
-
-
-
-
+        /*
         //bool haveKeys = false;
         //проходимся по значениям слов в словаре и сравниваем есть ли такие слова
         QMap<QString, QVector<Entry>>::const_iterator iter = freqDictionary->constBegin();
@@ -113,7 +108,7 @@ void addNewFreq(size_t docId, QMap<QString, QVector<Entry>>* freqDictionary, QMu
             tempEntry.count = 1;
 
         }
-        /*
+
         for(auto it = freqDictionary->begin(); it != freqDictionary->end(); ++it)
         {
 
@@ -142,6 +137,7 @@ void addNewFreq(size_t docId, QMap<QString, QVector<Entry>>* freqDictionary, QMu
 
 DocsIndexing::DocsIndexing()
 {
+    //this->freqDictionary = freqDictionary;
     freqDictionary = new QMap<QString, QVector<Entry>>;
 }
 
@@ -160,6 +156,8 @@ void DocsIndexing::addFreqThreaded()
     QVector<QFuture<void>> threads;
     threads.reserve(5);
 
+    QFutureWatcher<void> watcher;
+
     /*
     Entry test;
     test.count = 1;
@@ -171,40 +169,60 @@ void DocsIndexing::addFreqThreaded()
     testTwo.push_back(test);
     freqDictionary->insert("qwer", testTwo);
 */
-    //int threadsCount = 0;
+    int threadsCount = 0;
     for (int i = 0; i < docs.size(); i++)
     {
 
         threads.append(QtConcurrent::run(addNewFreq, i, freqDictionary, &writeIntoFreq, docs[i]));
-        //threadsCount++;
+        threadsCount++;
 
-        for (auto& future : threads) {
-            future.waitForFinished();
-        }
-
-        /*
         if (threadsCount == 5)
         {
-            for (auto& future : threads) {
-                future.waitForFinished();
+            for (auto& thread : threads)
+            {
+                watcher.setFuture(thread);
             }
+
+            watcher.waitForFinished();
 
             threadsCount = 0;
             threads.clear();
         }
-        */
     }
 
+    for (auto& thread : threads)
+    {
+        watcher.setFuture(thread);
+    }
 
+    watcher.waitForFinished();
+
+    /*
+    for (auto& future : threads)
+    {
+        future.waitForFinished();
+    }
+    */
+}
+
+void DocsIndexing::showFreq(QTextBrowser* browser)
+{
     QMap<QString, QVector<Entry>>::Iterator it;
     for(it = freqDictionary->begin(); it != freqDictionary->end(); it++)
     {
-        qDebug() << it.key();
+        QString out;
+        out = "index[\"" + it.key() + "\"]=";
         QVector<Entry> entr = it.value();
         for(int i = 0; i < entr.size(); i++)
         {
-            qDebug() << "DocId: " << entr[i].docId << " Count" << entr[i].count;
+            out += "{" + QString::number(entr[i].docId) + "," + QString::number(entr[i].count) + "}";
+            if (i != entr.size() - 1)
+            {
+                out += ", ";
+            }
         }
+        out += ";";
+        browser->append(out);
     }
 }
 

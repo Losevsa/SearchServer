@@ -1,30 +1,6 @@
 #include "searchserver.h"
 #include "ui_searchserver.h"
 
-//функции для qtconcurrent...
-/*
-void docsIndexing(int num, int *currCount)
-{
-
-    for(; *currCount < num;)
-    {
-        if (*currCount == 1)
-        {
-            qDebug() << "change";
-            break;
-        }
-        qDebug() << "no";
-    }
-}
-
-void docsIndexing()
-{
-
-}
-*/
-
-
-
 SearchServer::SearchServer(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::SearchServer)
@@ -36,6 +12,7 @@ SearchServer::SearchServer(QWidget *parent)
     }
     else
     {
+        //freq_dictionary = new QMap<QString, QVector<Entry>>;
         currentCount = new int(0);
         this->setWindowTitle(config.name);
         loadRequests();
@@ -130,13 +107,17 @@ void SearchServer::loadRequests()
     //QJsonObject configJson = jsonDoc.object().value("requests").toObject();
     // Получаем массив файлов
     QJsonArray files = jsonDoc.object().value("requests").toArray();
-    foreach (const QJsonValue& value, files) {
-        QVector<QString> temp;
-        temp.push_back(value.toString());
-        words.push_back(temp);
+    int count = 1;
+    foreach (const QJsonValue& value, files)
+    {
+        //QVector<QString> temp;
+        //temp.push_back(value.toString());
+        searchWords.addNewWords(value.toString(), count);
+        count++;
         //config.filesPath.push_back(value.toString());
                 //value.toString();
     }
+
 }
 
 void SearchServer::readFiles()
@@ -154,51 +135,13 @@ void SearchServer::readFiles()
     }
 
     indexing.addFreqThreaded();
+    indexing.showFreq(ui->freqDict);
     //indexing.addDocs(docs);
 }
 
-void SearchServer::checkFreq()
+void SearchServer::loadRequestIntoAnswer()
 {
-    //QtConcurrent::run(&indexing, &DocsIndexing::newFreq());
 
-    //QFuture<void> future = QtConcurrent::run(std::ref(indexing), &DocsIndexing::newFreq);
-
-    /*
-
-    for(int i = 0; i < config.filesPath.size(); i++)
-    {
-        QRegularExpression rx("\\s+");
-        QStringList words = docs[i].split(rx, Qt::SkipEmptyParts);
-
-        // Вывести каждое слово на отдельной строке
-        Entry entry;
-        entry.doc_id = i;
-        entry.count = 5;
-
-        QVector<Entry> temp;
-        temp.push_back(entry);
-
-        freq_dictionary.insert("test",temp);
-
-
-        //foreach(QString word, words)
-        //{
-        for(auto it = freq_dictionary.begin(); it != freq_dictionary.end(); ++it) {
-            qDebug() << "Key:" << it.key();
-
-            QVector<Entry> entries = it.value();
-            for(int i = 0; i < entries.size(); ++i) {
-                Entry entry = entries.at(i);
-                qDebug() << "Doc ID:" << entry.doc_id << "Count:" << entry.count;
-            }
-        }
-
-
-            //qDebug() << word;
-        //}
-        //Entry entry;
-    }
-    */
 }
 
 

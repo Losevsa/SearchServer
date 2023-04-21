@@ -11,10 +11,12 @@ CONFIG += c++17
 SOURCES += \
     docsindexing.cpp \
     main.cpp \
+    search.cpp \
     searchserver.cpp
 
 HEADERS += \
     docsindexing.h \
+    search.h \
     searchserver.h
 
 FORMS += \
